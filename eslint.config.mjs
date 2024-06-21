@@ -9,6 +9,7 @@ export default [
     {rules: {
         "indent": ["error", 4],
         "no-console": "off",
-    },
-    },
+    }},
+    {extends: ["eslint:recommended", "prettier"]},
+    ,
 ];

@@ -1,8 +1,24 @@
 // 必要なパッケージをインポートする
-import {GatewayIntentBits, Client, Partials, Message, Events, Collection, CommandInteraction, ChannelType} from "discord.js";
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { joinVoiceChannel, createAudioPlayer, NoSubscriberBehavior, EndBehaviorType, createAudioResource, StreamType } from "@discordjs/voice";
-import { commands } from "./src/slashCommands";
+import {
+    GatewayIntentBits,
+    Client,
+    Partials,
+    Message,
+    Events,
+    Collection,
+    CommandInteraction,
+    ChannelType,
+} from "discord.js";
+import {SlashCommandBuilder} from "@discordjs/builders";
+import {
+    joinVoiceChannel,
+    createAudioPlayer,
+    NoSubscriberBehavior,
+    EndBehaviorType,
+    createAudioResource,
+    StreamType,
+} from "@discordjs/voice";
+import {commands} from "./src/slashCommands";
 // import { pingCommand } from './src/commands/ping';
 // import {};
 // import { audio}
@@ -36,14 +52,12 @@ const collection = new Collection<string, Command>();
 //     }
 // });
 
-
 //スラッシュコマンド
 // client.on(Events.InteractionCreate, async interaction => {
 //     if (!interaction.isCommand()) return;
 
 //     console.log(interaction);
 //     const {commandName} = interaction;
-
 
 //     if (commandName === "ping") {
 //         await interaction.reply("Pong!");
@@ -58,8 +72,6 @@ interface Command {
     };
     execute: (interaction: CommandInteraction) => Promise<void>;
 }
-
-
 
 //スラッシュコマンドの設定
 // const commands = [
@@ -79,11 +91,10 @@ interface Command {
 //     ),
 // ];
 
-
 // client ready
 client.on(Events.ClientReady, async () => {
     // スラッシュコマンドの設定をDiscordに送信
-    const commandsData = commands.map((command) => command.data);
+    const commandsData = commands.map(command => command.data);
     await client.application?.commands.set(commandsData);
     // Ready表示
     console.log("Ready!");
@@ -93,20 +104,25 @@ client.on(Events.ClientReady, async () => {
 });
 
 // スラッシュコマンドの処理
-client.on(Events.InteractionCreate, async (interaction) => {
+client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isCommand()) return;
     const command = interaction.commandName;
 
     try {
-        const command = commands.find(command => command.data.name === interaction.commandName);
+        const command = commands.find(
+            command => command.data.name === interaction.commandName,
+        );
         if (!command) {
             console.error("Command not found");
             return;
-        };
+        }
         await command.execute(interaction);
     } catch (error) {
         console.error(error);
-        await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        await interaction.reply({
+            content: "There was an error while executing this command!",
+            ephemeral: true,
+        });
     }
     // Add more slash command handlers here if needed
 });

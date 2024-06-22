@@ -1,6 +1,23 @@
-import {GatewayIntentBits, Client, Partials, Message, Events, Collection, CommandInteraction, CommandInteractionOptionResolver, ChannelType} from "discord.js";
-import { SlashCommandBuilder } from "@discordjs/builders";
-import { joinVoiceChannel, createAudioPlayer, NoSubscriberBehavior, EndBehaviorType, createAudioResource, StreamType } from "@discordjs/voice";
+import {
+    GatewayIntentBits,
+    Client,
+    Partials,
+    Message,
+    Events,
+    Collection,
+    CommandInteraction,
+    CommandInteractionOptionResolver,
+    ChannelType,
+} from "discord.js";
+import {SlashCommandBuilder} from "@discordjs/builders";
+import {
+    joinVoiceChannel,
+    createAudioPlayer,
+    NoSubscriberBehavior,
+    EndBehaviorType,
+    createAudioResource,
+    StreamType,
+} from "@discordjs/voice";
 
 export const join = {
     data: new SlashCommandBuilder()
@@ -11,7 +28,8 @@ export const join = {
                 .setName("channel")
                 .setDescription("channel to join")
                 .setRequired(true)
-                .addChannelTypes(ChannelType.GuildVoice)),
+                .addChannelTypes(ChannelType.GuildVoice),
+        ),
     async execute(interaction: CommandInteraction) {
         const channel = (interaction.options as any).getChannel("channel");
         if (!channel) {
@@ -19,7 +37,7 @@ export const join = {
             return;
         }
         const connection = joinVoiceChannel({
-            group: 'listener',
+            group: "listener",
             channelId: channel.id,
             guildId: channel.guild.id,
             adapterCreator: channel.guild.voiceAdapterCreator,
@@ -29,7 +47,7 @@ export const join = {
         console.log("Joined the channel");
         // const player = createAudioPlayer();
         // connection.subscribe(player);
-        connection.receiver.speaking.on('start', (userId) => {
+        connection.receiver.speaking.on("start", userId => {
             console.log(`User ${userId} started speaking`);
             const audio = connection.receiver.subscribe(userId, {
                 end: {
@@ -47,9 +65,7 @@ export const join = {
             });
             player.play(resource);
             connection.subscribe(player);
-            console.log(`User ${userId} started speaking`);
         });
         await interaction.reply("Joined the channel");
-    }
+    },
 };
-

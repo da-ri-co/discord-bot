@@ -19,9 +19,9 @@ import {
     StreamType,
 } from "@discordjs/voice";
 
-export const joinParrot = {
+export const joinparrot = {
     data: new SlashCommandBuilder()
-        .setName("joinParrot")
+        .setName("joinparrot")
         .setDescription("join and return your voice to you")
         .addChannelOption(option =>
             option

@@ -67,13 +67,13 @@ export const join = {
                 const opusDecoder = new OpusEncoder(16000, 1);
                 const pcmData = opusDecoder.decode(chunk);
                 stream.push(pcmData);
-                console.log(stream);
+                // console.log(stream);
             });
             audio.on("end", () => {
                 console.log("end");
                 const audioStream = Buffer.concat(stream);
                 recorder(audioStream);
-                console.log(audioStream);
+                // console.log(audioStream);
             });
             // const passThrough = new PassThrough();
             // const decoder = () as any;

@@ -18,12 +18,11 @@ import {
     createAudioResource,
     StreamType,
 } from "@discordjs/voice";
-import {PassThrough} from "stream";
 
-export const join = {
+export const joinParrot = {
     data: new SlashCommandBuilder()
-        .setName("join")
-        .setDescription("join and record vc")
+        .setName("joinParrot")
+        .setDescription("join and return your voice to you")
         .addChannelOption(option =>
             option
                 .setName("channel")

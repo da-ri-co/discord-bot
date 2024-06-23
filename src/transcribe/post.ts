@@ -10,8 +10,6 @@ import {
     StartStreamTranscriptionCommandOutput,
 } from "@aws-sdk/client-transcribe-streaming";
 
-import {AudioReceiveStream} from "@discordjs/voice";
-
 const client = new TranscribeStreamingClient({
     region: "us-west-2",
 });
@@ -35,7 +33,7 @@ async function parseResponse(response: StartStreamTranscriptionCommandOutput) {
     return x;
 }
 
-export async function recorder(stream: AudioReceiveStream) {
+export async function recorder(stream: any) {
     const audioStream = async function* () {
         for await (const payloadChunk of stream) {
             yield {
@@ -48,7 +46,7 @@ export async function recorder(stream: AudioReceiveStream) {
     const params: StartStreamTranscriptionCommandInput = {
         AudioStream: audioStream(),
         LanguageCode: LanguageCode.JA_JP,
-        MediaEncoding: MediaEncoding.OGG_OPUS,
+        MediaEncoding: MediaEncoding.PCM,
         MediaSampleRateHertz: 16000,
     };
     const command = new StartStreamTranscriptionCommand(params);

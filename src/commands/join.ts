@@ -22,6 +22,7 @@ import {
 import { OpusEncoder } from "@discordjs/opus";
 import * as prism from 'prism-media';
 import {PassThrough, Writable, WritableOptions} from "stream";
+import { recorder } from "../transcribe/post";
 
 export const join = {
     data: new SlashCommandBuilder()
@@ -63,17 +64,15 @@ export const join = {
             let stream: Buffer[] = [];
             audio.on("data", (chunk) => {
                 console.log("data");
-                const opusDecoder = new OpusEncoder(48000, 1);
-                console.log('aa');
-                console.log(chunk);
+                const opusDecoder = new OpusEncoder(16000, 1);
                 const pcmData = opusDecoder.decode(chunk);
-                console.log(pcmData);
                 stream.push(pcmData);
                 console.log(stream);
             });
             audio.on("end", () => {
                 console.log("end");
                 const audioStream = Buffer.concat(stream);
+                recorder(audioStream);
                 console.log(audioStream);
             });
             // const passThrough = new PassThrough();

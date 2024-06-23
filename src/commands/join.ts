@@ -18,8 +18,7 @@ import {
     createAudioResource,
     StreamType,
 } from "@discordjs/voice";
-
-import {recorder} from "./../transcribe/post";
+import {PassThrough} from "stream";
 
 export const join = {
     data: new SlashCommandBuilder()
@@ -57,17 +56,16 @@ export const join = {
                     duration: 1000,
                 },
             });
-            //const player = createAudioPlayer({
-            //    behaviors: {
-            //        noSubscriber: NoSubscriberBehavior.Play,
-            //    },
-            //});
-            //const resource = createAudioResource(audio, {
-            //    inputType: StreamType.Opus,
-            //});
-            //player.play(resource);
-            //connection.subscribe(player);
-            recorder(audio);
+            const player = createAudioPlayer({
+                behaviors: {
+                    noSubscriber: NoSubscriberBehavior.Play,
+                },
+            });
+            const resource = createAudioResource(audio, {
+                inputType: StreamType.Opus,
+            });
+            player.play(resource);
+            connection.subscribe(player);
         });
         await interaction.reply("Joined the channel");
     },

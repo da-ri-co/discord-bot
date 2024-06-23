@@ -23,10 +23,24 @@ import {commands} from "./src/slashCommands";
 // import {};
 // import { audio}
 
-import dotenv from "dotenv";
+import {drizzle} from "drizzle-orm/node-postgres";
 
-// .envファイルを読み込む
+import dotenv from "dotenv";
+import * as schema from "./src/transcribe/schema";
+import {Client as pgClient} from "pg";
+
 dotenv.config();
+
+const pgclient = new pgClient({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: Number(process.env.DB_PORT),
+});
+const db = drizzle(pgclient);
+
+export default db;
 
 //Botで使うGatewayIntents、partials
 const client = new Client({

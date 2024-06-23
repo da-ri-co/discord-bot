@@ -17,8 +17,11 @@ import {
     EndBehaviorType,
     createAudioResource,
     StreamType,
+    AudioReceiveStream,
 } from "@discordjs/voice";
-import {PassThrough} from "stream";
+import { OpusEncoder } from "@discordjs/opus";
+import * as prism from 'prism-media';
+import {PassThrough, Writable, WritableOptions} from "stream";
 
 export const join = {
     data: new SlashCommandBuilder()
@@ -53,19 +56,35 @@ export const join = {
             const audio = connection.receiver.subscribe(userId, {
                 end: {
                     behavior: EndBehaviorType.AfterSilence,
-                    duration: 1000,
+                    duration: 100,
                 },
             });
-            const player = createAudioPlayer({
-                behaviors: {
-                    noSubscriber: NoSubscriberBehavior.Play,
-                },
+            console.log(audio);
+            let stream: Buffer[] = [];
+            audio.on("data", (chunk) => {
+                console.log("data");
+                const opusDecoder = new OpusEncoder(48000, 1);
+                console.log('aa');
+                console.log(chunk);
+                const pcmData = opusDecoder.decode(chunk);
+                console.log(pcmData);
+                stream.push(pcmData);
+                console.log(stream);
             });
-            const resource = createAudioResource(audio, {
-                inputType: StreamType.Opus,
+            audio.on("end", () => {
+                console.log("end");
+                const audioStream = Buffer.concat(stream);
+                console.log(audioStream);
             });
-            player.play(resource);
-            connection.subscribe(player);
+            // const passThrough = new PassThrough();
+            // const decoder = () as any;
+            // audio.pipe(new prism.opus.Decoder({channels: 2, rate: 48000, frameSize: 960}));
+            // audio.pipe(passThrough);
+            // console.log(decoder);
+            // const resource = createAudioResource(audio, {
+            //     inputType: StreamType.OggOpus,
+            // });
+            // console.log(resource);
         });
         await interaction.reply("Joined the channel");
     },

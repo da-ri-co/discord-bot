@@ -10,33 +10,24 @@ import {
     StartStreamTranscriptionCommandOutput,
 } from "@aws-sdk/client-transcribe-streaming";
 
-const MicrophoneStream = require("microphone-stream").default;
+import {AudioReceiveStream} from "@discordjs/voice";
 
 const client = new TranscribeStreamingClient({
     region: "us-west-2",
-    // credentials: {
-    //     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    //     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    // },
 });
-async function parseResponse(
-    response: StartStreamTranscriptionCommandOutput,
-    source: string,
-) {
-    let x = source;
+async function parseResponse(response: StartStreamTranscriptionCommandOutput) {
+    let x = "";
     for await (const event of response.TranscriptResultStream!) {
         if (event.TranscriptEvent) {
+            const message = event.TranscriptEvent!;
             const results = event.TranscriptEvent.Transcript!.Results;
-
-            let transcript = "";
             results!
-                .filter(result => !result.IsPartial)
+                .filter(result => result.IsPartial === false)
                 .map(result => {
                     (result.Alternatives || []).map(alternative => {
-                        transcript = alternative
+                        x += alternative
                             .Items!.map(item => item.Content)
                             .join(" ");
-                        x += transcript;
                     });
                 });
         }
@@ -44,20 +35,34 @@ async function parseResponse(
     return x;
 }
 
-async function recorder(stream: PassThrough) {
+export async function recorder(stream: AudioReceiveStream) {
+    const audioStream = async function* () {
+        for await (const payloadChunk of stream) {
+            yield {
+                AudioEvent: {
+                    AudioChunk: payloadChunk,
+                },
+            };
+        }
+    };
     const params: StartStreamTranscriptionCommandInput = {
-        AudioStream: stream,
-        ClientId: "client_id",
+        AudioStream: audioStream(),
         LanguageCode: LanguageCode.JA_JP,
         MediaEncoding: MediaEncoding.OGG_OPUS,
         MediaSampleRateHertz: 16000,
     };
     const command = new StartStreamTranscriptionCommand(params);
-    let response: StartStreamTranscriptionCommandOutput;
-    const res = (async() => {
+
+    const response = await (async () => {
         try {
-            response = await client.send(command);
-            return await parseResponse(response);
+            return await client.send(command);
+        } catch (error: any) {
+            console.dir(error);
+        }
+    })();
+    const res = await (async () => {
+        try {
+            return await parseResponse(response!);
         } catch (error: any) {
             console.dir(error);
         }
@@ -65,12 +70,3 @@ async function recorder(stream: PassThrough) {
     console.log(res);
     return res;
 }
-
-//async function test_recorder(receiver, userId) {
-//  try {
-//    fs.readFileSync('./test.opus')
-//    fs.createReadStream('./test.opus').pipe(recognizeStream)
-//  } catch (error) {
-//    console.log(error)
-//  }
-//}
